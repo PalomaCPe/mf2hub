@@ -1,0 +1,61 @@
+<div class="page-header">
+    <h3> <span class="glyphicon glyphicon-calendar"></span> {{ pageName }} </h3>
+</div>
+
+<div class="page-content">
+    <form #roleForm="ngForm" novalidate>
+        <div class="form-group col-md-6">
+            <label for="transaction">Transação</label>
+            <label>Campo obrigatório</label>
+            <input id="transaction" [(ngModel)]="transaction" type="text" name="name" placeholder="PEH3" class="form-control" required
+                #name="ngModel" [disabled]="show">
+        </div>
+        <div class="form-group">
+            <div class="col-sm-10" style="margin-bottom:32px">
+                <button type="submit" class="btn btn-default btn-primary btn-outline" (click)="getTransaction()">Buscar</button>
+                <button type="submit" class="btn btn-default btn-primary btn-outline" (click)="getFile()">Download</button>
+                <button type="button" class="btn btn-default btn-primary btn-outline" (click)="back()">Voltar</button>
+            </div>
+        </div>
+    </form>
+
+
+    <div *ngIf="show">
+        <table class="table table-borded table-striped table-hover table-responsive">
+            <thead>
+                <tr>
+                    <th>Transação</th>
+                    <th>Tipo</th>
+                    <th>Formato</th>
+                    <th>Seq</th>
+                    <th>Campo</th>
+                    <th>Literal</th>
+                    <th>Delimitador</th>
+                    <th>Atributo</th>
+                    <th>Tamanho</th>
+                    <th>Tipo2</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let transaction of transactions">
+                    <td>{{transaction.Transacao }}</td>
+                    <td>{{transaction.Tipo }}</td>
+                    <td>{{transaction.Formato }}</td>
+                    <td>{{transaction.Seq }}</td>
+                    <td>{{transaction.Campo }}</td>
+                    <td>{{transaction.Literal }}</td>
+                    <td>{{transaction.Delimitador }}</td>
+                    <td>{{transaction.Atributo }}</td>
+                    <td>{{transaction.Tamanho }}</td>
+                    <td>{{transaction.Tipo2 }}</td>
+                    <!--<td><span class="sequencemat folder-open" [routerLink]="['/booking', 'detail', booking.id]">&nbsp;</span></td>-->
+                </tr>
+            </tbody>
+        </table>
+        <div class="form-group">
+            <div class="col-sm-10">
+                <!--<button type="button" class="btn btn-primary btn-outline" [routerLink]="['/transaction', 'new', 0]">Novo</button>-->
+            </div>
+        </div>
+    </div>
+</div>

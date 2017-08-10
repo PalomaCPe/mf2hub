@@ -1,1 +1,1 @@
-# mf2hub
+# maf2hub
