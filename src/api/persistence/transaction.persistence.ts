@@ -45,8 +45,33 @@ export class TransactionPersistence {
         );
     }
 
+    soaDetails: Template[];
+    getDetail(): Promise<Template[]> {
+        let database: Db;
+        return Promise.resolve(
+            Connection.conn()
+                .then((db: Db) => {
+                    database = db;
+
+                    return db.collection('campo_soa').find().toArray();
+                })
+                .then((data: Template[]) => {
+                    database.close();
+
+                    return data as Template[];
+                })
+        );
+
+    }
+
     readAndDownload(id: string, res: any) {
         let database: Db;
+
+        this.getDetail()
+        .then((result: Template[]) => {
+            this.soaDetails = result;
+        });;
+
         return Promise.resolve(
             Connection.conn()
                 .then((db: Db) => {
@@ -59,7 +84,7 @@ export class TransactionPersistence {
 
                     let workbook = this.createTemplate(transaction);
 
-                    workbook.write('Template.xlsx', res);
+                    workbook.write('Template'+id+'.xlsx', res);
 
                     let teste = workbook;
 
@@ -96,18 +121,32 @@ export class TransactionPersistence {
         worksheet.cell(1, 4).string('Valor');
         worksheet.cell(1, 5).string('Tipo');
         worksheet.cell(1, 6).string('Cardinalidade');
-        worksheet.cell(1, 7).string('Operacao');
+        worksheet.cell(1, 7).string('Descricao');
     }
 
     setTabela(worksheet: any, campos: any) {
         for (var i = 0, len = campos.length; i < len; i++) {
             var row = i + 2;
-            worksheet.cell(row, 1).string(''); //iib
+            let detail: Template;
+
+            detail = this.soaDetails.find(x => x.Backend == campos[i].field);
+            if (detail == undefined) {
+                detail = new Template();
+                detail.IIB = '';
+                detail.ZUP = '';
+                detail.Valor = '';
+                detail.Tipo = 'String';
+                detail.Cardinalidade = '[0-1]';
+                detail.Descricao = 'Campo';
+            }
+
+            worksheet.cell(row, 1).string(detail.IIB); //iib
             worksheet.cell(row, 2).string(campos[i].field); //backend
-            worksheet.cell(row, 3).string(''); //zup
-            worksheet.cell(row, 4).string(''); //value
-            worksheet.cell(row, 5).string(''); //type
-            worksheet.cell(row, 6).string(''); //
+            worksheet.cell(row, 3).string(detail.ZUP); //zup
+            worksheet.cell(row, 4).string(detail.Valor); //value
+            worksheet.cell(row, 5).string(detail.Tipo); //type
+            worksheet.cell(row, 6).string(detail.Cardinalidade); //Cardinalidade
+            worksheet.cell(row, 7).string(detail.Descricao); //Descricao
         }
     }
 
