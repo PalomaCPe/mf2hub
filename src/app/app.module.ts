@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 // ROTA
 import { RouterModule, Router } from '@angular/router';
+import * as FileSaver from 'file-saver'; 
 
 import { AppComponent } from './app.component';
 import { TransactionModule } from './transaction/transaction.module';
@@ -16,7 +17,7 @@ import 'rxjs/add/operator/toPromise';
     HttpModule,
     RouterModule //ROTA
         .forRoot([{ path: '', redirectTo: '/', pathMatch: 'full' }])],
-    declarations: [AppComponent],
+    declarations: [AppComponent ],
     bootstrap: [AppComponent]
 })
 

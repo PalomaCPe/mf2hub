@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 
 import { TransactionService } from './transaction.service';
-import { Transaction } from './transaction';
-import { TransactionTest } from './transactionTest';
 
-import { TemplateExcel } from './template';
-
+import { Transaction } from '../../api/model/transaction';
+import { Template } from '../../api/model/template';
+//import {  } from 'excellentexport';
+const SERVICE_URL: string = 'api/transaction';
 @Component({
     moduleId: module.id,
     templateUrl: 'transaction.html'
@@ -13,12 +13,11 @@ import { TemplateExcel } from './template';
 
 export class TransactionComponent implements OnInit {
     constructor(
-        private _service: TransactionService,
-        private _tempService: TemplateExcel
+        private _service: TransactionService
     ) { }
 
     pageName: string = 'Buscar transações';
-    transactions: TransactionTest[];
+    transactions: Transaction[];
     transaction: string;
     show: boolean;
 
@@ -27,18 +26,21 @@ export class TransactionComponent implements OnInit {
 
     getTransaction() {
         this._service.getTransaction(this.transaction)
-            .then((result: TransactionTest[]) => {
+            .then((result: Transaction[]) => {
                 this.transactions = result;
                 this.show = true;
             });
     }
 
-    getFile(){
-        this._service.getTransaction(this.transaction)
-        .then((result: TransactionTest[]) => {
-            this._tempService.createFile(result); 
-        });
-    }
+    getFile(){        
+        let url: string = `${SERVICE_URL}/getXls/${this.transaction}`;
+        window.open(url);
+
+        // this._service.getTransactionXls(this.transaction)
+        //     .then((result: string) => {
+        //         console.log(result);
+        //     });
+    }    
 
     back(){
         this.show = false;

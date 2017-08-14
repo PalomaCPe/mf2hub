@@ -1,12 +1,12 @@
-export class Transaction{
-    transaction: string;
+export class Transaction {
+    code: string;
     type: string;
     format: string;
-    sequence: number;
+    sequence: string;
     field: string;
     literal: string;
-    delimiter: number;
-    attribute: string;
-    length: number;
-    secondType: string;
+    delimiter: string;
+    attribut: string;
+    size: string;
+    secondeType: string;
 }

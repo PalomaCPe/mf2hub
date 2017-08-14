@@ -6,11 +6,12 @@ import { RouterModule, Router } from '@angular/router';
 import { TransactionComponent } from './transaction.component';
 
 import { TransactionService } from './transaction.service';
-import { TemplateExcel } from './template';
 
 import { PercentualPipe } from '../shared/percentualPipe';
 
 import { FormsModule } from '@angular/forms';
+
+import * as XLSX from 'xlsx';
 
 @NgModule({
     imports: [BrowserModule,
@@ -18,10 +19,9 @@ import { FormsModule } from '@angular/forms';
     // ROTA
     RouterModule.forChild([
         { path: 'transactions', component: TransactionComponent}
-        //{ path: 'booking/:action/:id', component: BookingDetailComponent }
     ])],
     declarations: [ TransactionComponent, PercentualPipe ],
-    providers: [ TransactionService, TemplateExcel ]
+    providers: [ TransactionService ]
 })
 
 export class TransactionModule { }

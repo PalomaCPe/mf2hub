@@ -1,7 +1,14 @@
 import { MongoClient, Db, InsertOneWriteOpResult, FindAndModifyWriteOpResultObject } from 'mongodb';
 
-import { Transaction } from '../model/transaction';
 import { Connection } from './connection';
+import { Transaction } from '../model/transaction';
+import { Template } from '../model/template';
+
+var excel = require('excel4node');
+var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
+var modelCampoMF: Transaction;
+var modelCampoSOA: Template;
 
 export class TransactionPersistence {
     list(): Promise<Transaction[]> {
@@ -11,7 +18,7 @@ export class TransactionPersistence {
                 .then((db: Db) => {
                     database = db;
 
-                    return db.collection('campo_mf').find().toArray();
+                    return db.collection('transactions').find().toArray();
                 })
                 .then((result: Transaction[]) => {
                     database.close();
@@ -28,8 +35,8 @@ export class TransactionPersistence {
                 .then((db: Db) => {
                     database = db;
 
-                    return db.collection('campo_mf').find({ Transacao: id }).toArray();
-                })
+                    return db.collection('transactions').find({ code: id }).toArray();
+                })  
                 .then((transaction: Transaction[]) => {
                     database.close();
 
@@ -37,6 +44,73 @@ export class TransactionPersistence {
                 })
         );
     }
+
+    readAndDownload(id: string, res: any) {
+        let database: Db;
+        return Promise.resolve(
+            Connection.conn()
+                .then((db: Db) => {
+                    database = db;
+
+                    return db.collection('transactions').find({ code: id }).toArray();
+                })
+                .then((transaction: Transaction[]) => {
+                    let soaService = {};
+
+                    let workbook = this.createTemplate(transaction);
+
+                    workbook.write('Template.xlsx', res);
+
+                    let teste = workbook;
+
+                    database.close();
+                })
+        );
+    }
+
+    sendFile(obj: any): any{
+        return obj;
+    }
+
+    createTemplate(data: any): any {
+        let workbook = new excel.Workbook();
+        let worksheetInput = workbook.addWorksheet('Input');
+        let worksheetOutput = workbook.addWorksheet('Output');
+
+        this.setCabecalho(worksheetInput);
+        this.setCabecalho(worksheetOutput);
+
+        let dataInput = data.filter(x => x.type == 'Entrada');
+        let dataOutput = data.filter(x => x.type == 'Saída');
+
+        this.setTabela(worksheetInput, dataInput);
+        this.setTabela(worksheetOutput, dataOutput);
+
+        return workbook;
+    }
+
+    setCabecalho(worksheet: any) {
+        worksheet.cell(1, 1).string('IIB');
+        worksheet.cell(1, 2).string('Backend');
+        worksheet.cell(1, 3).string('ZUP');
+        worksheet.cell(1, 4).string('Valor');
+        worksheet.cell(1, 5).string('Tipo');
+        worksheet.cell(1, 6).string('Cardinalidade');
+        worksheet.cell(1, 7).string('Operacao');
+    }
+
+    setTabela(worksheet: any, campos: any) {
+        for (var i = 0, len = campos.length; i < len; i++) {
+            var row = i + 2;
+            worksheet.cell(row, 1).string(''); //iib
+            worksheet.cell(row, 2).string(campos[i].field); //backend
+            worksheet.cell(row, 3).string(''); //zup
+            worksheet.cell(row, 4).string(''); //value
+            worksheet.cell(row, 5).string(''); //type
+            worksheet.cell(row, 6).string(''); //
+        }
+    }
+
 
     create(transaction: Transaction): Promise<Transaction> {
         let database: Db;
@@ -47,17 +121,17 @@ export class TransactionPersistence {
                 .then((db: Db) => {
                     database = db;
 
-                    return db.collection('campo_mf').insertOne({
-                        Transacao: transaction.transaction,
+                    return db.collection('transactions').insertOne({
+                        Transacao: transaction.code,
                         Tipo: transaction.type,
                         Formato: transaction.format,
                         Seq: transaction.sequence,
                         Campo: transaction.field,
                         Literal: transaction.literal,
                         Delimitador: transaction.delimiter,
-                        Atributo: transaction.attribute,
-                        Tamanho: transaction.length,
-                        Tipo2: transaction.secondType
+                        Atributo: transaction.attribut,
+                        Tamanho: transaction.size,
+                        Tipo2: transaction.secondeType
                     })
                 })
                 .then((inserted: InsertOneWriteOpResult) => {
@@ -109,7 +183,7 @@ export class TransactionPersistence {
             .then((db: Db) => {
                 database = db;
 
-                return db.collection('campo_mf').findOneAndUpdate(
+                return db.collection('transactions').findOneAndUpdate(
                     { id: id },
                     { $set: { 'deleted': true } });
             })

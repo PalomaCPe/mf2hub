@@ -24,6 +24,19 @@ transactionRouter.get('/:id', (request: Request, response: Response) => {
         });
 });
 
+transactionRouter.get('/getXls/:id', (request: Request, response: Response) => {
+    let transactionApplication: TransactionApplication = new TransactionApplication();
+
+    let id: string = request.params.id;
+    
+    response.header('Content-Type', 'application/vnd.ms-excel')
+
+    transactionApplication.getTransactionAndFile(id, response)
+        .then((file: any) => {
+            response.end;
+        });
+});
+
 transactionRouter.post('/post', (request: Request, response: Response) => {
     let transactionApplication: TransactionApplication = new TransactionApplication();
 

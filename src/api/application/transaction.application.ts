@@ -14,6 +14,10 @@ export class TransactionApplication{
         return this.transactionPersistence.read(id);
     }
 
+    getTransactionAndFile(id: string, res: any) {
+        return this.transactionPersistence.readAndDownload(id, res);
+    }
+
     createTransaction(transaction: Transaction): Promise<Transaction>{
         return this.transactionPersistence.create(transaction);
     }
